@@ -20,11 +20,13 @@ public class Model {
 	private ImdbDAO dao;
 	private Graph<Director, DefaultWeightedEdge> grafo;
 	private Map<Integer, Director> idMap;
+	private List<Director> best;
+	private int totAttoriCondivisi;
 	
 	public Model() {
 		this.dao = new ImdbDAO();
 		this.idMap = new HashMap<Integer, Director>();
-		
+		this.totAttoriCondivisi = 0;
 	}
 	
 	public String creaGrafo(Integer anno) {
@@ -66,8 +68,54 @@ public class Model {
 	
 	
 	
+	public List<Director> calcolaPercorsoMax(Director partenza, int c){
+		this.best = new ArrayList<>();
+		List<Director> parziale = new ArrayList<>();
+		
+		
+		parziale.add(partenza);
+		
+		cerca(parziale, c);
+		return best;
+	}
+	
+	
+	private void cerca(List<Director> parziale, int c) {
+
+		//condizione di terminazione
+		if(parziale.size()>best.size()) {
+				best = new ArrayList<Director>(parziale);
+				this.totAttoriCondivisi = sommaPesi(this.best);
+			}
+			
+		List<Director> vicini = Graphs.neighborListOf(this.grafo, parziale.get(parziale.size()-1)) ;
+
+		
+		for(Director d : vicini) {
+			if(!parziale.contains(d) && (sommaPesi(parziale)+this.grafo.getEdgeWeight(this.grafo.getEdge(parziale.get(parziale.size()-1),d)))<=c) {
+				parziale.add(d) ;
+				cerca(parziale, c) ;
+				parziale.remove(parziale.size()-1) ;
+			}
+			}
+		}
+		
+
+	private int sommaPesi(List<Director> parziale) {
+		int peso = 0;
+		for(int i=1; i<parziale.size(); i++) {
+			double p = this.grafo.getEdgeWeight(this.grafo.getEdge(parziale.get(i-1), parziale.get(i))) ;
+			peso += p ;
+		}
+		return peso ;
+	}
+
 	public Set<Director> getDirector(){
 		return this.grafo.vertexSet();
+	}
+
+	public int getTotAttoriCondivisi() {
+		return totAttoriCondivisi;
 	}
 	
 }

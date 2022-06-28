@@ -79,7 +79,35 @@ public class FXMLController {
 
     @FXML
     void doRicorsione(ActionEvent event) {
+    	txtResult.clear();
+    	
+    	
+    	try {
+        	Integer c = Integer.parseInt(txtAttoriCondivisi.getText());
+        	Director dir = boxRegista.getValue();
+        	
+        	if(dir != null && c!=null) {
+        		
+        		txtResult.appendText("Cammino piu lungo:\n");
+        		for(Director d : this.model.calcolaPercorsoMax(dir, c)) {
+        			txtResult.appendText(d+"\n");
+        		}
+        		txtResult.appendText("Tot attori condivisi: "+this.model.getTotAttoriCondivisi());
+        	}
+        	else {
+        		
+        		txtResult.setText("Scegli un regista\n");
+        		return;
+        	}
+        	
 
+    	}catch(NumberFormatException e) {
+    		e.printStackTrace();
+    		return;
+    	}
+    	
+    	
+    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
